@@ -1,4 +1,4 @@
-import { getProductsList } from "/web/api.js";
+import { getData } from "/web/api.js";
 
 export default function ProductListPage({ $target, initialState, onClick }) {
     this.$element = document.createElement('div');
@@ -8,7 +8,6 @@ export default function ProductListPage({ $target, initialState, onClick }) {
     this.state = initialState;
 
     const handleClick = ({ target }) => {
-      const { productList } = this.state;
       const product = target.closest(".Product");
       if (!product) return;
       const { productId } = product.dataset;
@@ -23,8 +22,11 @@ export default function ProductListPage({ $target, initialState, onClick }) {
         this.render();
     }
 
-    this.render = () => {
-      const {productList} = this.state;
+    this.render = async () => {
+      const { productList, display } = this.state;
+      this.$element.style.display = (display) ? "block" : "none";
+
+      if (display){
         const contentsList = `
         <ul>
           ${productList.map((e) => 
@@ -42,23 +44,13 @@ export default function ProductListPage({ $target, initialState, onClick }) {
         </ul>
         `;
        this.$element.innerHTML = this.$title + contentsList;
-
+      }
     }
 
-    getProductsList({setState: this.setState});
-    this.$element.addEventListener("click", handleClick);
+    this.init = async () => {
+      const data = await getData();
+      this.setState({ productList: data });
+      this.$element.addEventListener("click", handleClick);
+      this.render();
+    }
 };
-
-{/* <div class="ProductListPage">
-<h1>상품목록</h1>
-<ul>
-  <li class="Product">
-    <img src="https://grepp-cloudfront.s3.ap-northeast-2.amazonaws.com/programmers_imgs/assignment_image/cafe_coffee_cup.png">
-    <div class="Product__info">
-      <div>커피잔</div>
-      <div>10,000원~</div>
-    </div>
-  </li>
-  
-</ul>
-</div> */}

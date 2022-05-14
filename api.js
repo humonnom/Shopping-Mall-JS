@@ -13,11 +13,5 @@ const fetchData = async (url) => {
 };
 
 export const getData = async (id) => {
-  return fetchData(`${END_POINT}/${id ? id : ""}`);
+  return fetchData(`${END_POINT}${id ? `/${id}` : ""}`);
 };
-
-export const getProductsList = async ({ setState }) => {
-  const data = await getData();
-  setState({ productList: data });
-}
-

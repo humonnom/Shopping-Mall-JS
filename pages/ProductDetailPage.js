@@ -31,9 +31,13 @@ export default function ProcuctDetailPage({ $target, initialState }) {
       $select.addEventListener('change', onSelect);
     }
 
-    this.render = () => {
-        const { id, target, totalPrice, selectedOptions } = this.state;
-        // console.log(target);
+    this.render = async () => {
+        console.log('init');
+        const { id, totalPrice, selectedOptions, display } = this.state;
+        const target = await getData(id);
+        this.$element.style.display = (display) ? "block" : "none";
+        if (display){
+          console.log(target)
         const title = `<h1>${target.name} 상품 정보</h1>`
         const contentsList = `
          <div class="ProductDetail">
@@ -44,7 +48,6 @@ export default function ProcuctDetailPage({ $target, initialState }) {
             <select>
               <option>선택하세요.</option>
               ${target.productOptions.map((option) => {
-                console.log(option);
                 return `
                   <option>${option.name}</option>
                 `;
@@ -68,17 +71,13 @@ export default function ProcuctDetailPage({ $target, initialState }) {
           </div>
         </div>
         `;
-       this.$element.innerHTML = title + contentsList;
-      setEvents();
+        this.$element.innerHTML = title + contentsList;
+        setEvents();
+        }
       }
 
-    const init = async () => {
-      const { id } = this.state;
-      const data = await getData(id);
-      this.setState({ target: data });
-    }
+    
 
-    init();
 };
 
 // <li>

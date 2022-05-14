@@ -1,58 +1,86 @@
 import ProductListPage from "./pages/ProductListPage.js"
 import CartPage from "./pages/CartPage.js"
 import ProductDetailPage from "./pages/ProductDetailPage.js"
+import { goTo } from "./router.js";
 
 export default function App({ $target }) {
 
-    const processRoute = () => {
+    this.state = {
+        id: -1,
+        page: "",
+    };
+
+    this.processRoute = () => {
         const { pathname } = window.location;
         const [, , page, id] = pathname.split('/');
+        console.log('process route');
 
-        if (pathname === '/web/') this.setState({ page: 'ProductListPage'});
-        else if (page === 'products') this.setState({ page: 'ProductDetailPage', id});
-        else if (page === 'cart') this.setState({ page: 'CartPage'});
-        else this.setState({ page: 'unknown' });
+        if (pathname === '/web/') {
+            console.log('web');
+            productListPage.init();
+            this.setState({ page: 'productListPage'});
+        } else if (page === 'products' && id) {
+            console.log('products');
+                // productDetailPage.init();
+                this.setState({ page: 'productDetailPage', id});
+        } else if (page === 'cart' ) {
+            console.log('cart');
+                // cartPage.render();
+                this.setState({ page: 'cartPage'});
+        } else {
+             alert('잘못된 경로입니다.')
+        }
     }
 
-    this.state = {
-        page: "ProductListPage",
-        id: null,
-    }
+    // 컴포넌트 생성
 
     this.setState = (nextState) => {
         this.state = {
             ...this.state,
             ...nextState,
         }
-        this.render();
-    }
-
-    this.render = () => {
-        const {page} = this.state;
-        if (page === 'ProductListPage') new ProductListPage({ 
-            $target,
-            initialState: {
-                productList: [],
-            },
-            onClick : (productId) => {
-                location.href = `/web/products/${productId}`;
-            }
+        productListPage.setState({ 
+            display: this.state.page === "productListPage"
         });
-        else if (page === 'ProductDetailPage') new ProductDetailPage({ 
-            $target,
-            initialState: {
-                id: this.state.id,
-                target: null,
-                selectedOptions: [],
-                totalPrice: 0,
-            },
+        productDetailPage.setState({ 
+            display: this.state.page === "productDetailPage",
+            id: this.state.id,
         });
-        else if (page === 'CartPage' ) new CartPage({ 
-            $target,
-            initialState: {
-
-            },
+        cartPage.setState({ 
+            display: this.state.page === "cartPage"
         });
     }
-    processRoute();
+
+
+    const productListPage = new ProductListPage({ 
+        $target,
+        initialState: {
+            display: true,
+            productList: [],
+        },
+        onClick : (productId) => {
+            goTo(`/web/products/${productId}`);
+        }
+    });
+
+    const productDetailPage = new ProductDetailPage({ 
+        $target,
+        initialState: {
+            display: false,
+            id: this.state.id,
+            target: null,
+            selectedOptions: [],
+            totalPrice: 0,
+        },
+    });
+
+    const cartPage = new CartPage({ 
+        $target,
+        initialState: {
+            display: false,
+        },
+    })
+
+    window.addEventListener('route_change', this.processRoute);
+    this.processRoute();
 };

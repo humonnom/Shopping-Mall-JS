@@ -1,1 +1,1 @@
-# web-202109-DevMatching-webfe2nd-client
+# 바닐라 JS로 SPA 구현 연습
